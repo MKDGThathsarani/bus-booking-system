@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bus Booking System</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-custom">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">
+                <i class="fas fa-bus me-2"></i>Bus Booking
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-lg-center">
+                    <li class="nav-item">
+                        <span class="navbar-text me-3" id="userDisplay">
+                            <i class="fas fa-user me-1"></i>Guest
+                        </span>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="dashboard.html">
+                            <i class="fas fa-chart-bar me-1"></i>Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <button class="btn btn-outline-light btn-sm me-2" id="loginBtn" 
+                                onclick="window.location.href='login.html'">
+                            <i class="fas fa-sign-in-alt me-1"></i>Login
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="btn btn-outline-danger btn-sm" id="logoutBtn" 
+                                onclick="logoutUser()" style="display:none;">
+                            <i class="fas fa-sign-out-alt me-1"></i>Logout
+                        </button>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Alert Container -->
+    <div id="alertContainer" class="container mt-3"></div>
+
+    <!-- Main Content -->
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-12">
+                <!-- Search Section -->
+                <div class="card shadow">
+                    <div class="card-header">
+                        <h4 class="mb-0">
+                            <i class="fas fa-search me-2"></i>Search Buses
+                        </h4>
+                    </div>
+                    <div class="card-body">
+                        <form id="searchForm">
+                            <div class="row g-3">
+                                <div class="col-md-3">
+                                    <label for="fromLocation" class="form-label">
+                                        <i class="fas fa-map-marker-alt me-1 text-success"></i>From
+                                    </label>
+                                    <input type="text" class="form-control" id="fromLocation" 
+                                           placeholder="e.g., Colombo" required>
+                                </div>
+                                <div class="col-md-3">
+                                    <label for="toLocation" class="form-label">
+                                        <i class="fas fa-map-marker-alt me-1 text-danger"></i>To
+                                    </label>
+                                    <input type="text" class="form-control" id="toLocation" 
+                                           placeholder="e.g., Kandy" required>
+                                </div>
+                                <div class="col-md-3">
+                                    <label for="travelDate" class="form-label">
+                                        <i class="fas fa-calendar-day me-1"></i>Travel Date
+                                    </label>
+                                    <input type="date" class="form-control" id="travelDate" required>
+                                </div>
+                                <div class="col-md-3 d-flex align-items-end">
+                                    <button type="submit" class="btn btn-primary w-100">
+                                        <i class="fas fa-search me-2"></i>Search Buses
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Search Results -->
+        <div id="searchResults" class="mt-4"></div>
+    </div>
+
+    <!-- Booking Modal -->
+    <div class="modal fade" id="bookingModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-ticket-alt me-2"></i>Book Your Seats
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row g-3">
+                        <!-- Passenger Details -->
+                        <div class="col-md-6">
+                            <h6 class="fw-bold text-primary-custom mb-3">
+                                <i class="fas fa-user me-2"></i>Passenger Details
+                            </h6>
+                            <div class="mb-3">
+                                <label for="passengerName" class="form-label">Full Name</label>
+                                <input type="text" class="form-control" id="passengerName" 
+                                       placeholder="Enter name" value="Guest">
+                            </div>
+                            <div class="row">
+                                <div class="col-6">
+                                    <label for="passengerAge" class="form-label">Age</label>
+                                    <input type="number" class="form-control" id="passengerAge" 
+                                           min="1" max="120" placeholder="Age">
+                                </div>
+                                <div class="col-6">
+                                    <label for="passengerGender" class="form-label">Gender</label>
+                                    <select class="form-select" id="passengerGender">
+                                        <option value="Male">Male</option>
+                                        <option value="Female">Female</option>
+                                        <option value="Other">Other</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Seat Selection -->
+                        <div class="col-md-6">
+                            <h6 class="fw-bold text-primary-custom mb-3">
+                                <i class="fas fa-chair me-2"></i>Select Seats
+                            </h6>
+                            <div class="seat-grid" id="seatGrid"></div>
+                            <div class="d-flex justify-content-between align-items-center mt-3">
+                                <span>
+                                    <i class="fas fa-check-circle text-success me-1"></i>
+                                    Selected: <strong id="selectedCount">0</strong> seats
+                                </span>
+                                <span class="badge bg-warning">
+                                    <i class="fas fa-info-circle me-1"></i>Max 5 seats
+                                </span>
+                            </div>
+                            <div class="d-flex gap-2 mt-2 flex-wrap">
+                                <span><span class="badge bg-success">Available</span></span>
+                                <span><span class="badge bg-secondary">Booked</span></span>
+                                <span><span class="badge bg-primary">Selected</span></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-1"></i>Close
+                    </button>
+                    <button class="btn btn-success" onclick="confirmBooking()">
+                        <i class="fas fa-check me-2"></i>Confirm Booking
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer mt-5">
+        <div class="container text-center">
+            <p class="mb-0">
+                <i class="fas fa-bus me-2"></i>
+                Bus Booking System - Internet Technology Coursework
+                <br>
+                <small>© 2024 All Rights Reserved</small>
+            </p>
+        </div>
+    </footer>
+
+    <!-- Loading Spinner -->
+    <div id="loadingSpinner" class="loading-overlay" style="display:none;">
+        <div class="text-center">
+            <div class="spinner-border" role="status"></div>
+            <p class="loading-text">Loading...</p>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Custom JS -->
+    <script src="js/api.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/search.js"></script>
+    <script src="js/booking.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Update UI based on login status
+            updateUI();
+            
+            // Set default date to tomorrow
+            const dateInput = document.getElementById('travelDate');
+            if (dateInput) {
+                const tomorrow = new Date();
+                tomorrow.setDate(tomorrow.getDate() + 1);
+                dateInput.value = tomorrow.toISOString().split('T')[0];
+            }
+            
+            // Search Form Handler
+            document.getElementById('searchForm').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                const from = document.getElementById('fromLocation').value.trim();
+                const to = document.getElementById('toLocation').value.trim();
+                const date = document.getElementById('travelDate').value;
+                
+                if (!from || !to || !date) {
+                    showAlert('warning', 'Please fill all search fields');
+                    return;
+                }
+                
+                await searchBuses(from, to, date);
+            });
+            
+            // Auto search on load
+            setTimeout(() => {
+                document.getElementById('searchForm').dispatchEvent(new Event('submit'));
+            }, 500);
+        });
+    </script>
+</body>
+</html>
