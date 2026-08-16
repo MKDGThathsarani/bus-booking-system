@@ -6,14 +6,28 @@
  * Login user using Bus Booking API
  */
 async function loginUser(username, password) {
+    // Show loading
     showLoading(true);
     
+    // Validate input
+    if (!username || !password) {
+        showAlert('warning', 'Please enter both username and password');
+        showLoading(false);
+        return false;
+    }
+    
     try {
+        // Log what we're sending
+        console.log('📤 Attempting login with:', { username, password: '***' });
+        
         const response = await apiPost('/BusBooking/login', {
             userName: username,
             password: password
         });
         
+        console.log('📥 Login response:', response);
+        
+        // Check if response is successful
         if (isSuccess(response)) {
             const userData = getData(response);
             
@@ -24,17 +38,20 @@ async function loginUser(username, password) {
             sessionStorage.setItem('loginTime', new Date().toISOString());
             
             showAlert('success', `Welcome back, ${username}! 🎉`);
-            console.log('✅ Login successful:', userData);
             
             // Redirect based on role
             const role = userData.role || userData.userType || 'User';
-            if (role === 'Admin' || role === 'Vendor') {
-                window.location.href = 'dashboard.html';
-            } else {
-                window.location.href = 'index.html';
-            }
+            setTimeout(() => {
+                if (role === 'Admin' || role === 'Vendor') {
+                    window.location.href = 'dashboard.html';
+                } else {
+                    window.location.href = 'index.html';
+                }
+            }, 1000);
+            
             return true;
         } else {
+            // Login failed - show error message
             const errorMsg = getErrorMessage(response);
             showAlert('danger', `Login failed: ${errorMsg} ❌`);
             console.error('❌ Login failed:', errorMsg);
@@ -108,17 +125,6 @@ function isVendor() {
 }
 
 /**
- * Check if user has specific role
- */
-function hasRole(roles) {
-    const userRole = getUserRole();
-    if (Array.isArray(roles)) {
-        return roles.includes(userRole);
-    }
-    return userRole === roles;
-}
-
-/**
  * Require login - Redirect if not logged in
  */
 function requireLogin() {
@@ -126,21 +132,6 @@ function requireLogin() {
         showAlert('warning', 'Please login first 🔐');
         setTimeout(() => {
             window.location.href = 'login.html';
-        }, 1500);
-        return false;
-    }
-    return true;
-}
-
-/**
- * Require admin - Redirect if not admin
- */
-function requireAdmin() {
-    if (!requireLogin()) return false;
-    if (!isAdmin()) {
-        showAlert('danger', 'Access denied. Admin only ⛔');
-        setTimeout(() => {
-            window.location.href = 'index.html';
         }, 1500);
         return false;
     }

@@ -6,7 +6,7 @@
     <title>Login - Bus Booking System</title>
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Font Awesome (optional) -->
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Custom CSS -->
     <link rel="stylesheet" href="css/style.css">
@@ -34,16 +34,18 @@
                                     <i class="fas fa-user me-1"></i>Username / Email
                                 </label>
                                 <input type="text" class="form-control" id="username" 
-                                       placeholder="Enter username" required>
+                                       placeholder="Enter username" 
+                                       value="admin" required>
                             </div>
                             <div class="mb-3">
                                 <label for="password" class="form-label">
                                     <i class="fas fa-lock me-1"></i>Password
                                 </label>
                                 <input type="password" class="form-control" id="password" 
-                                       placeholder="Enter password" required>
+                                       placeholder="Enter password" 
+                                       value="admin123" required>
                             </div>
-                            <button type="submit" class="btn btn-primary w-100 py-2">
+                            <button type="submit" class="btn btn-primary w-100 py-2" id="loginBtn">
                                 <i class="fas fa-sign-in-alt me-2"></i>Login
                             </button>
                         </form>
@@ -72,7 +74,7 @@
     <div id="loadingSpinner" class="loading-overlay" style="display:none;">
         <div class="text-center">
             <div class="spinner-border" role="status"></div>
-            <p class="loading-text">Loading...</p>
+            <p class="loading-text">Logging in...</p>
         </div>
     </div>
 
@@ -82,19 +84,45 @@
     <script src="js/api.js"></script>
     <script src="js/auth.js"></script>
     <script>
-        // Login Form Handler
+        // Login Form Handler with better error handling
         document.getElementById('loginForm').addEventListener('submit', async function(e) {
             e.preventDefault();
+            
+            // Disable button to prevent multiple clicks
+            const loginBtn = document.getElementById('loginBtn');
+            loginBtn.disabled = true;
+            loginBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Logging in...';
             
             const username = document.getElementById('username').value.trim();
             const password = document.getElementById('password').value.trim();
             
-            if (!username || !password) {
-                showAlert('warning', 'Please enter both username and password');
-                return;
+            try {
+                await loginUser(username, password);
+            } catch (error) {
+                console.error('❌ Form submission error:', error);
+                showAlert('danger', 'An unexpected error occurred. Please try again.');
+            } finally {
+                // Re-enable button
+                loginBtn.disabled = false;
+                loginBtn.innerHTML = '<i class="fas fa-sign-in-alt me-2"></i>Login';
             }
-            
-            await loginUser(username, password);
+        });
+        
+        // Test API connection on page load
+        document.addEventListener('DOMContentLoaded', async function() {
+            console.log('🔍 Testing API connection...');
+            try {
+                const testResponse = await fetch(API_BASE + '/BusBooking/GetBusVendors');
+                if (testResponse.ok) {
+                    console.log('✅ API connection successful!');
+                } else {
+                    console.warn('⚠️ API connection failed with status:', testResponse.status);
+                    showAlert('warning', '⚠️ Cannot connect to API server. Please check your connection.');
+                }
+            } catch (error) {
+                console.error('❌ API connection test failed:', error);
+                showAlert('danger', '❌ Cannot connect to API server. Please check your internet connection and API URL.');
+            }
         });
     </script>
 </body>
