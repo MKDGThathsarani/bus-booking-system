@@ -2,14 +2,13 @@
 // API Configuration
 // ==========================================
 
-// 🔴 IMPORTANT: Change this to your actual API URL
-// Get this from your course coordinator or API documentation
-// Example: https://freeprojectapi.azurewebsites.net/api
-const API_BASE = 'https://your-api-domain.com/api';
+// 🔴 IMPORTANT: ඔබගේ ACTUAL API URL එක මෙතන දාන්න
+// ඔබගේ lecturer ගෙන් හෝ API documentation එකෙන් මෙය ලබා ගන්න
+const API_BASE = 'https://freeprojectapi.azurewebsites.net/api';
 const HEADERS = { 'Content-Type': 'application/json' };
 
 // ==========================================
-// API Helper Functions
+// API Helper Functions with Better Error Handling
 // ==========================================
 
 /**
@@ -18,18 +17,40 @@ const HEADERS = { 'Content-Type': 'application/json' };
 async function apiGet(endpoint) {
     try {
         console.log(`📤 GET: ${API_BASE}${endpoint}`);
+        
         const response = await fetch(API_BASE + endpoint, {
             method: 'GET',
             headers: HEADERS
         });
+        
+        // Check if response is OK
+        if (!response.ok) {
+            console.error(`❌ HTTP Error: ${response.status} ${response.statusText}`);
+            return { 
+                result: false, 
+                message: `Server error: ${response.status} ${response.statusText}` 
+            };
+        }
+        
         const data = await response.json();
         console.log(`📥 GET Response:`, data);
         return data;
+        
     } catch (error) {
-        console.error('❌ GET Error:', error);
+        console.error('❌ Network Error:', error);
+        
+        // More specific error messages
+        let errorMessage = 'Network error - Please check your connection';
+        
+        if (error.message.includes('Failed to fetch')) {
+            errorMessage = 'Cannot connect to server. Please check if API is running.';
+        } else if (error.message.includes('NetworkError')) {
+            errorMessage = 'Network error. Please check your internet connection.';
+        }
+        
         return { 
             result: false, 
-            message: 'Network error - Please check your connection' 
+            message: errorMessage 
         };
     }
 }
@@ -40,16 +61,27 @@ async function apiGet(endpoint) {
 async function apiPost(endpoint, body) {
     try {
         console.log(`📤 POST: ${API_BASE}${endpoint}`, body);
+        
         const response = await fetch(API_BASE + endpoint, {
             method: 'POST',
             headers: HEADERS,
             body: JSON.stringify(body)
         });
+        
+        if (!response.ok) {
+            console.error(`❌ HTTP Error: ${response.status} ${response.statusText}`);
+            return { 
+                result: false, 
+                message: `Server error: ${response.status} ${response.statusText}` 
+            };
+        }
+        
         const data = await response.json();
         console.log(`📥 POST Response:`, data);
         return data;
+        
     } catch (error) {
-        console.error('❌ POST Error:', error);
+        console.error('❌ Network Error:', error);
         return { 
             result: false, 
             message: 'Network error - Please check your connection' 
@@ -63,16 +95,26 @@ async function apiPost(endpoint, body) {
 async function apiPut(endpoint, body) {
     try {
         console.log(`📤 PUT: ${API_BASE}${endpoint}`, body);
+        
         const response = await fetch(API_BASE + endpoint, {
             method: 'PUT',
             headers: HEADERS,
             body: JSON.stringify(body)
         });
+        
+        if (!response.ok) {
+            return { 
+                result: false, 
+                message: `Server error: ${response.status} ${response.statusText}` 
+            };
+        }
+        
         const data = await response.json();
         console.log(`📥 PUT Response:`, data);
         return data;
+        
     } catch (error) {
-        console.error('❌ PUT Error:', error);
+        console.error('❌ Network Error:', error);
         return { 
             result: false, 
             message: 'Network error - Please check your connection' 
@@ -86,15 +128,25 @@ async function apiPut(endpoint, body) {
 async function apiDelete(endpoint) {
     try {
         console.log(`📤 DELETE: ${API_BASE}${endpoint}`);
+        
         const response = await fetch(API_BASE + endpoint, {
             method: 'DELETE',
             headers: HEADERS
         });
+        
+        if (!response.ok) {
+            return { 
+                result: false, 
+                message: `Server error: ${response.status} ${response.statusText}` 
+            };
+        }
+        
         const data = await response.json();
         console.log(`📥 DELETE Response:`, data);
         return data;
+        
     } catch (error) {
-        console.error('❌ DELETE Error:', error);
+        console.error('❌ Network Error:', error);
         return { 
             result: false, 
             message: 'Network error - Please check your connection' 
@@ -124,9 +176,9 @@ function getData(response) {
  * Get error message from API response
  */
 function getErrorMessage(response) {
-    return response && response.message 
-        ? response.message 
-        : 'Unknown error occurred';
+    if (!response) return 'Unknown error occurred';
+    if (response.message) return response.message;
+    return 'Unknown error occurred';
 }
 
 // ==========================================
@@ -137,6 +189,7 @@ function getErrorMessage(response) {
  * Show alert message
  */
 function showAlert(type, message) {
+    // Find or create alert container
     let container = document.getElementById('alertContainer');
     if (!container) {
         const div = document.createElement('div');
@@ -146,17 +199,29 @@ function showAlert(type, message) {
         container = div;
     }
     
+    // Create alert
     const alert = document.createElement('div');
     alert.className = `alert alert-${type} alert-dismissible fade show`;
+    
+    // Get icon based on type
+    let icon = 'info-circle';
+    if (type === 'success') icon = 'check-circle';
+    else if (type === 'danger') icon = 'exclamation-circle';
+    else if (type === 'warning') icon = 'exclamation-triangle';
+    
     alert.innerHTML = `
-        <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'danger' ? 'exclamation-circle' : type === 'warning' ? 'exclamation-triangle' : 'info-circle'} me-2"></i>
+        <i class="fas fa-${icon} me-2"></i>
         ${message}
         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
     `;
+    
     container.appendChild(alert);
     
+    // Auto dismiss after 5 seconds
     setTimeout(() => {
-        if (alert.parentNode) alert.remove();
+        if (alert.parentNode) {
+            alert.remove();
+        }
     }, 5000);
 }
 
