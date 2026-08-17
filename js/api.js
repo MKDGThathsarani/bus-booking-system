@@ -5,7 +5,10 @@
 // 🔴 IMPORTANT: ඔබගේ ACTUAL API URL එක මෙතන දාන්න
 // ඔබගේ lecturer ගෙන් හෝ API documentation එකෙන් මෙය ලබා ගන්න
 const API_BASE = 'https://freeprojectapi.azurewebsites.net/api';
-const HEADERS = { 'Content-Type': 'application/json' };
+const HEADERS = { 
+    'Content-Type': 'application/json',
+    'Accept': 'application/json'
+};
 
 // ==========================================
 // API Helper Functions with Better Error Handling
@@ -20,7 +23,9 @@ async function apiGet(endpoint) {
         
         const response = await fetch(API_BASE + endpoint, {
             method: 'GET',
-            headers: HEADERS
+            headers: HEADERS,
+            mode: 'cors',
+            credentials: 'include'
         });
         
         // Check if response is OK
@@ -46,6 +51,8 @@ async function apiGet(endpoint) {
             errorMessage = 'Cannot connect to server. Please check if API is running.';
         } else if (error.message.includes('NetworkError')) {
             errorMessage = 'Network error. Please check your internet connection.';
+        } else if (error.message.includes('CORS')) {
+            errorMessage = 'CORS error. API server may not allow cross-origin requests.';
         }
         
         return { 
@@ -65,7 +72,9 @@ async function apiPost(endpoint, body) {
         const response = await fetch(API_BASE + endpoint, {
             method: 'POST',
             headers: HEADERS,
-            body: JSON.stringify(body)
+            body: JSON.stringify(body),
+            mode: 'cors',
+            credentials: 'include'
         });
         
         if (!response.ok) {
@@ -82,9 +91,19 @@ async function apiPost(endpoint, body) {
         
     } catch (error) {
         console.error('❌ Network Error:', error);
+        
+        // More specific error messages
+        let errorMessage = 'Network error - Please check your connection';
+        
+        if (error.message.includes('Failed to fetch')) {
+            errorMessage = 'Cannot connect to server. Please check if API is running.';
+        } else if (error.message.includes('CORS')) {
+            errorMessage = 'CORS error. API server may not allow cross-origin requests.';
+        }
+        
         return { 
             result: false, 
-            message: 'Network error - Please check your connection' 
+            message: errorMessage 
         };
     }
 }
@@ -99,7 +118,9 @@ async function apiPut(endpoint, body) {
         const response = await fetch(API_BASE + endpoint, {
             method: 'PUT',
             headers: HEADERS,
-            body: JSON.stringify(body)
+            body: JSON.stringify(body),
+            mode: 'cors',
+            credentials: 'include'
         });
         
         if (!response.ok) {
@@ -131,7 +152,9 @@ async function apiDelete(endpoint) {
         
         const response = await fetch(API_BASE + endpoint, {
             method: 'DELETE',
-            headers: HEADERS
+            headers: HEADERS,
+            mode: 'cors',
+            credentials: 'include'
         });
         
         if (!response.ok) {

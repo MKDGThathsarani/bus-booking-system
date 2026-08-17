@@ -20,10 +20,20 @@ async function loginUser(username, password) {
         // Log what we're sending
         console.log('📤 Attempting login with:', { username, password: '***' });
         
-        const response = await apiPost('/BusBooking/login', {
+        // Try both endpoint variations to handle API inconsistencies
+        let response = await apiPost('/BusBooking/login', {
             userName: username,
             password: password
         });
+        
+        // If login fails due to endpoint not found, try alternative endpoint
+        if (!isSuccess(response) && response.message && response.message.includes('404')) {
+            console.log('📤 Trying alternative login endpoint...');
+            response = await apiPost('/auth/login', {
+                userName: username,
+                password: password
+            });
+        }
         
         console.log('📥 Login response:', response);
         
@@ -53,13 +63,15 @@ async function loginUser(username, password) {
         } else {
             // Login failed - show error message
             const errorMsg = getErrorMessage(response);
-            showAlert('danger', `Login failed: ${errorMsg} ❌`);
-            console.error('❌ Login failed:', errorMsg);
+            const displayMsg = errorMsg ? `Login failed: ${errorMsg}` : 'Login failed. Please check your credentials and try again.';
+            showAlert('danger', displayMsg);
+            console.error('❌ Login failed:', errorMsg, response);
             return false;
         }
     } catch (error) {
         console.error('❌ Login error:', error);
-        showAlert('danger', 'Login failed. Please try again.');
+        const errorMsg = error.message || 'Unknown error occurred';
+        showAlert('danger', `Login failed: ${errorMsg}. Please check your internet connection and try again.`);
         return false;
     } finally {
         showLoading(false);
