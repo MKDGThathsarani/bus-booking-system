@@ -22,7 +22,7 @@ async function searchBuses(fromLocation, toLocation, travelDate) {
             return [];
         }
     } catch (error) {
-        console.error('❌ Search error:', error);
+        console.error('Search error:', error);
         showAlert('danger', 'Failed to search buses');
         return [];
     } finally {
@@ -41,7 +41,7 @@ function displaySearchResults(buses) {
         container.innerHTML = `
             <div class="alert alert-warning text-center py-5">
                 <i class="fas fa-bus fa-3x d-block mb-3 text-muted"></i>
-                <h5>🚌 No buses found</h5>
+                <h5><i class="fas fa-bus me-2"></i>No buses found</h5>
                 <p class="mb-0 text-muted">Try different location or date</p>
             </div>
         `;
