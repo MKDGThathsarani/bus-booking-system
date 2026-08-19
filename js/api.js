@@ -2,7 +2,7 @@
 // API Configuration
 // ==========================================
 
-// 🔴 IMPORTANT: ඔබගේ ACTUAL API URL එක මෙතන දාන්න
+// IMPORTANT: ඔබගේ ACTUAL API URL එක මෙතන දාන්න
 // ඔබගේ lecturer ගෙන් හෝ API documentation එකෙන් මෙය ලබා ගන්න
 const API_BASE = 'https://freeprojectapi.azurewebsites.net/api';
 const HEADERS = { 
@@ -19,7 +19,7 @@ const HEADERS = {
  */
 async function apiGet(endpoint) {
     try {
-        console.log(`📤 GET: ${API_BASE}${endpoint}`);
+        console.log(`GET: ${API_BASE}${endpoint}`);
         
         const response = await fetch(API_BASE + endpoint, {
             method: 'GET',
@@ -30,7 +30,7 @@ async function apiGet(endpoint) {
         
         // Check if response is OK
         if (!response.ok) {
-            console.error(`❌ HTTP Error: ${response.status} ${response.statusText}`);
+            console.error(`HTTP Error: ${response.status} ${response.statusText}`);
             return { 
                 result: false, 
                 message: `Server error: ${response.status} ${response.statusText}` 
@@ -38,11 +38,11 @@ async function apiGet(endpoint) {
         }
         
         const data = await response.json();
-        console.log(`📥 GET Response:`, data);
+        console.log(`GET Response:`, data);
         return data;
         
     } catch (error) {
-        console.error('❌ Network Error:', error);
+        console.error('Network Error:', error);
         
         // More specific error messages
         let errorMessage = 'Network error - Please check your connection';
@@ -67,7 +67,7 @@ async function apiGet(endpoint) {
  */
 async function apiPost(endpoint, body) {
     try {
-        console.log(`📤 POST: ${API_BASE}${endpoint}`, body);
+        console.log(`POST: ${API_BASE}${endpoint}`, body);
         
         const response = await fetch(API_BASE + endpoint, {
             method: 'POST',
@@ -78,7 +78,7 @@ async function apiPost(endpoint, body) {
         });
         
         if (!response.ok) {
-            console.error(`❌ HTTP Error: ${response.status} ${response.statusText}`);
+            console.error(`HTTP Error: ${response.status} ${response.statusText}`);
             return { 
                 result: false, 
                 message: `Server error: ${response.status} ${response.statusText}` 
@@ -86,11 +86,11 @@ async function apiPost(endpoint, body) {
         }
         
         const data = await response.json();
-        console.log(`📥 POST Response:`, data);
+        console.log(`POST Response:`, data);
         return data;
         
     } catch (error) {
-        console.error('❌ Network Error:', error);
+        console.error('Network Error:', error);
         
         // More specific error messages
         let errorMessage = 'Network error - Please check your connection';
@@ -113,7 +113,7 @@ async function apiPost(endpoint, body) {
  */
 async function apiPut(endpoint, body) {
     try {
-        console.log(`📤 PUT: ${API_BASE}${endpoint}`, body);
+        console.log(`PUT: ${API_BASE}${endpoint}`, body);
         
         const response = await fetch(API_BASE + endpoint, {
             method: 'PUT',
@@ -131,11 +131,11 @@ async function apiPut(endpoint, body) {
         }
         
         const data = await response.json();
-        console.log(`📥 PUT Response:`, data);
+        console.log(`PUT Response:`, data);
         return data;
         
     } catch (error) {
-        console.error('❌ Network Error:', error);
+        console.error('Network Error:', error);
         return { 
             result: false, 
             message: 'Network error - Please check your connection' 
@@ -148,7 +148,7 @@ async function apiPut(endpoint, body) {
  */
 async function apiDelete(endpoint) {
     try {
-        console.log(`📤 DELETE: ${API_BASE}${endpoint}`);
+        console.log(`DELETE: ${API_BASE}${endpoint}`);
         
         const response = await fetch(API_BASE + endpoint, {
             method: 'DELETE',
@@ -165,11 +165,11 @@ async function apiDelete(endpoint) {
         }
         
         const data = await response.json();
-        console.log(`📥 DELETE Response:`, data);
+        console.log(`DELETE Response:`, data);
         return data;
         
     } catch (error) {
-        console.error('❌ Network Error:', error);
+        console.error('Network Error:', error);
         return { 
             result: false, 
             message: 'Network error - Please check your connection' 

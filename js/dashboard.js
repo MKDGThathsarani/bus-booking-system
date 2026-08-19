@@ -19,7 +19,7 @@ async function loadDashboard() {
         document.getElementById('dashboardContent').innerHTML = `
             <div class="alert alert-info text-center py-5">
                 <i class="fas fa-user fa-3x d-block mb-3 text-primary"></i>
-                <h5>👤 Customer Dashboard</h5>
+                <h5><i class="fas fa-user me-2"></i>Customer Dashboard</h5>
                 <p class="text-muted">Your booking history will appear here.</p>
             </div>
         `;
@@ -60,7 +60,7 @@ async function loadVendorDashboard(vendorId) {
         renderDashboardStats(bookings);
         
     } catch (error) {
-        console.error('❌ Dashboard error:', error);
+        console.error('Dashboard error:', error);
         container.innerHTML = `
             <div class="alert alert-danger text-center py-5">
                 <i class="fas fa-times-circle fa-3x d-block mb-3"></i>
@@ -82,7 +82,7 @@ function renderDashboardStats(bookings) {
         container.innerHTML = `
             <div class="alert alert-info text-center py-5">
                 <i class="fas fa-chart-bar fa-3x d-block mb-3 text-muted"></i>
-                <h5>📊 No bookings yet</h5>
+                <h5><i class="fas fa-chart-bar me-2"></i>No bookings yet</h5>
                 <p class="text-muted">Start selling tickets! Create bus schedules and bookings will appear here.</p>
                 <a href="index.html" class="btn btn-primary mt-3">
                     <i class="fas fa-plus me-2"></i>Create Schedule
@@ -98,28 +98,28 @@ function renderDashboardStats(bookings) {
         <div class="row g-3 mb-4">
             <div class="col-md-3 col-6">
                 <div class="stat-card">
-                    <span class="stat-icon">📋</span>
+                    <span class="stat-icon"><i class="fas fa-clipboard-list"></i></span>
                     <div class="stat-number">${stats.totalBookings}</div>
                     <div class="stat-label">Total Bookings</div>
                 </div>
             </div>
             <div class="col-md-3 col-6">
                 <div class="stat-card-secondary">
-                    <span class="stat-icon">👤</span>
+                    <span class="stat-icon"><i class="fas fa-user"></i></span>
                     <div class="stat-number">${stats.totalPassengers}</div>
                     <div class="stat-label">Total Passengers</div>
                 </div>
             </div>
             <div class="col-md-3 col-6">
                 <div class="stat-card">
-                    <span class="stat-icon">📅</span>
+                    <span class="stat-icon"><i class="fas fa-calendar-alt"></i></span>
                     <div class="stat-number">${stats.todayBookings}</div>
                     <div class="stat-label">Today's Bookings</div>
                 </div>
             </div>
             <div class="col-md-3 col-6">
                 <div class="stat-card-secondary">
-                    <span class="stat-icon">💰</span>
+                    <span class="stat-icon"><i class="fas fa-coins"></i></span>
                     <div class="stat-number">₹${stats.totalRevenue.toFixed(2)}</div>
                     <div class="stat-label">Total Revenue</div>
                 </div>

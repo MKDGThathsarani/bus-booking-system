@@ -29,7 +29,7 @@ async function loadBookedSeats(scheduleId) {
         const bookedSeats = isSuccess(response) ? (getData(response) || []) : [];
         renderSeatGrid(bookedSeats);
     } catch (error) {
-        console.error('❌ Error loading seats:', error);
+        console.error('Error loading seats:', error);
         showAlert('danger', 'Failed to load seat availability');
     }
 }
@@ -85,7 +85,7 @@ function toggleSeat(seatNumber) {
         selectedSeats.splice(index, 1);
     } else {
         if (selectedSeats.length >= MAX_SEATS) {
-            showAlert('warning', `Maximum ${MAX_SEATS} seats per booking ⚠️`);
+            showAlert('warning', `<i class="fas fa-exclamation-triangle me-2"></i>Maximum ${MAX_SEATS} seats per booking`);
             return;
         }
         selectedSeats.push(seatNumber);
@@ -127,7 +127,7 @@ function updateSelectedCount() {
  */
 async function confirmBooking() {
     if (selectedSeats.length === 0) {
-        showAlert('warning', 'Please select at least one seat ⚠️');
+        showAlert('warning', '<i class="fas fa-exclamation-triangle me-2"></i>Please select at least one seat');
         return;
     }
     
@@ -161,7 +161,7 @@ async function confirmBooking() {
         const response = await apiPost('/BusBooking/PostBusBooking', bookingData);
         
         if (isSuccess(response)) {
-            showAlert('success', `🎫 Booking confirmed! ${selectedSeats.length} seat(s) booked.`);
+            showAlert('success', `<i class="fas fa-ticket-alt me-2"></i>Booking confirmed! ${selectedSeats.length} seat(s) booked.`);
             const modal = bootstrap.Modal.getInstance(document.getElementById('bookingModal'));
             if (modal) modal.hide();
             selectedSeats = [];
@@ -170,7 +170,7 @@ async function confirmBooking() {
             showAlert('danger', getErrorMessage(response) || 'Booking failed');
         }
     } catch (error) {
-        console.error('❌ Booking error:', error);
+        console.error('Booking error:', error);
         showAlert('danger', 'Failed to complete booking');
     } finally {
         showLoading(false);
@@ -181,13 +181,13 @@ async function confirmBooking() {
  * Cancel booking
  */
 async function cancelBooking(bookingId) {
-    if (!confirm('Are you sure you want to cancel this booking? 🗑️')) return;
+    if (!confirm('Are you sure you want to cancel this booking?')) return;
     
     showLoading(true);
     try {
         const response = await apiDelete(`/BusBooking/DeleteBusBooking?bookingId=${bookingId}`);
         if (isSuccess(response)) {
-            showAlert('success', 'Booking cancelled successfully ✅');
+            showAlert('success', '<i class="fas fa-check-circle me-2"></i>Booking cancelled successfully');
             if (typeof loadDashboard === 'function') {
                 loadDashboard();
             }
@@ -195,7 +195,7 @@ async function cancelBooking(bookingId) {
             showAlert('danger', getErrorMessage(response) || 'Failed to cancel booking');
         }
     } catch (error) {
-        console.error('❌ Cancel error:', error);
+        console.error('Cancel error:', error);
         showAlert('danger', 'Failed to cancel booking');
     } finally {
         showLoading(false);

@@ -18,7 +18,7 @@ async function loginUser(username, password) {
     
     try {
         // Log what we're sending
-        console.log('📤 Attempting login with:', { username, password: '***' });
+        console.log('Attempting login with:', { username, password: '***' });
         
         // Try both endpoint variations to handle API inconsistencies
         let response = await apiPost('/BusBooking/login', {
@@ -28,14 +28,14 @@ async function loginUser(username, password) {
         
         // If login fails due to endpoint not found, try alternative endpoint
         if (!isSuccess(response) && response.message && response.message.includes('404')) {
-            console.log('📤 Trying alternative login endpoint...');
+            console.log('Trying alternative login endpoint...');
             response = await apiPost('/auth/login', {
                 userName: username,
                 password: password
             });
         }
         
-        console.log('📥 Login response:', response);
+        console.log('Login response:', response);
         
         // Check if response is successful
         if (isSuccess(response)) {
@@ -47,7 +47,7 @@ async function loginUser(username, password) {
             sessionStorage.setItem('username', username);
             sessionStorage.setItem('loginTime', new Date().toISOString());
             
-            showAlert('success', `Welcome back, ${username}! 🎉`);
+            showAlert('success', `<i class="fas fa-check-circle me-2"></i>Welcome back, ${username}!`);
             
             // Redirect based on role
             const role = userData.role || userData.userType || 'User';
@@ -65,11 +65,11 @@ async function loginUser(username, password) {
             const errorMsg = getErrorMessage(response);
             const displayMsg = errorMsg ? `Login failed: ${errorMsg}` : 'Login failed. Please check your credentials and try again.';
             showAlert('danger', displayMsg);
-            console.error('❌ Login failed:', errorMsg, response);
+            console.error('Login failed:', errorMsg, response);
             return false;
         }
     } catch (error) {
-        console.error('❌ Login error:', error);
+        console.error('Login error:', error);
         const errorMsg = error.message || 'Unknown error occurred';
         showAlert('danger', `Login failed: ${errorMsg}. Please check your internet connection and try again.`);
         return false;
@@ -83,7 +83,7 @@ async function loginUser(username, password) {
  */
 function logoutUser() {
     sessionStorage.clear();
-    showAlert('info', 'Logged out successfully 🔒');
+    showAlert('info', '<i class="fas fa-lock me-2"></i>Logged out successfully');
     setTimeout(() => {
         window.location.href = 'login.html';
     }, 1500);
@@ -105,7 +105,7 @@ function getCurrentUser() {
         try {
             return JSON.parse(userJson);
         } catch (e) {
-            console.error('❌ Error parsing user data:', e);
+            console.error('Error parsing user data:', e);
             return null;
         }
     }
@@ -141,7 +141,7 @@ function isVendor() {
  */
 function requireLogin() {
     if (!isLoggedIn()) {
-        showAlert('warning', 'Please login first 🔐');
+        showAlert('warning', '<i class="fas fa-lock me-2"></i>Please login first');
         setTimeout(() => {
             window.location.href = 'login.html';
         }, 1500);
