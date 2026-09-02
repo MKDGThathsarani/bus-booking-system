@@ -101,7 +101,7 @@ function displaySearchResults(buses) {
                                 <small class="text-muted d-block">
                                     <i class="fas fa-tag me-1"></i>Price
                                 </small>
-                                <strong class="text-success h5">₹${bus.price || 0}</strong>
+                                <strong class="text-success h5">LKR ${bus.price || 0}</strong>
                             </div>
                         </div>
                         

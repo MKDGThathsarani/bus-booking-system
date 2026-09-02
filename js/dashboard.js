@@ -120,7 +120,7 @@ function renderDashboardStats(bookings) {
             <div class="col-md-3 col-6">
                 <div class="stat-card-secondary">
                     <span class="stat-icon"><i class="fas fa-coins"></i></span>
-                    <div class="stat-number">₹${stats.totalRevenue.toFixed(2)}</div>
+                    <div class="stat-number">LKR ${stats.totalRevenue.toFixed(2)}</div>
                     <div class="stat-label">Total Revenue</div>
                 </div>
             </div>
@@ -238,7 +238,7 @@ function renderBookingsTable(bookings) {
                         <th><i class="fas fa-hashtag me-1"></i>ID</th>
                         <th><i class="fas fa-user me-1"></i>Customer</th>
                         <th><i class="fas fa-users me-1"></i>Passengers</th>
-                        <th><i class="fas fa-rupee-sign me-1"></i>Amount</th>
+                        <th><i class="fas fa-rupee-sign me-1"></i>Amount (LKR)</th>
                         <th><i class="fas fa-calendar me-1"></i>Date</th>
                         <th><i class="fas fa-info-circle me-1"></i>Status</th>
                         <th><i class="fas fa-cog me-1"></i>Action</th>
@@ -268,7 +268,7 @@ function renderBookingsTable(bookings) {
                     <small class="text-muted">Seats: ${passengers.map(p => p.seatNo).join(', ')}</small>
                 </td>
                 <td>
-                    <strong class="text-success">₹${(booking.totalAmount || 0).toFixed(2)}</strong>
+                    <strong class="text-success">LKR ${(booking.totalAmount || 0).toFixed(2)}</strong>
                 </td>
                 <td>
                     ${formatDate(booking.bookingDate)}
