@@ -29,3 +29,13 @@ This is a **complete Bus Booking System** built as a coursework project for the 
 - **sessionStorage** - Session Management
 
 ## Project Structure
+
+Open `index.html` directly in a browser to run the website. The app includes a browser-persisted demo mode, so search, seat selection, bookings, cancellation, and the dashboard work without a backend. If the configured API is reachable, it is still attempted first.
+
+### Demo Accounts
+
+- Admin: `admin` / `admin123`
+- Vendor: `vendor` / `vendor123`
+- Customer: `customer` / `customer123`
+
+Bookings are stored in `localStorage` under `demoBookings`. Clear that key in browser storage to reset the demo data.

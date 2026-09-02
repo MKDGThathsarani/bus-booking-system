@@ -108,27 +108,6 @@
             }
         });
         
-        // Test API connection on page load
-        document.addEventListener('DOMContentLoaded', async function() {
-            console.log('Testing API connection...');
-            try {
-                const testResponse = await fetch(API_BASE + '/BusBooking/GetBusVendors', {
-                    method: 'GET',
-                    headers: HEADERS,
-                    mode: 'cors',
-                    credentials: 'include'
-                });
-                if (testResponse.ok) {
-                    console.log('API connection successful!');
-                } else {
-                    console.warn('API connection failed with status:', testResponse.status);
-                    showAlert('warning', '<i class="fas fa-exclamation-triangle me-2"></i>Cannot connect to API server (Status: ' + testResponse.status + '). Please check your connection.');
-                }
-            } catch (error) {
-                console.error('API connection test failed:', error);
-                showAlert('danger', '<i class="fas fa-times-circle me-2"></i>Cannot connect to API server. Error: ' + error.message + '. Please check your internet connection and API URL.');
-            }
-        });
     </script>
 </body>
 </html>

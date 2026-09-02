@@ -10,6 +10,53 @@ const HEADERS = {
     'Accept': 'application/json'
 };
 
+const DEMO_BUSES = [
+    { scheduleId: 101, busName: 'Lanka Express', busVehicleNo: 'NB-4587', fromLocation: 'Colombo', toLocation: 'Kandy', departureTime: '2026-09-03T06:30:00', arrivalTime: '2026-09-03T10:15:00', price: 1450, totalSeats: 20, bookedSeats: 6 },
+    { scheduleId: 102, busName: 'Hill Country Coach', busVehicleNo: 'NC-2190', fromLocation: 'Colombo', toLocation: 'Kandy', departureTime: '2026-09-03T09:00:00', arrivalTime: '2026-09-03T12:45:00', price: 1750, totalSeats: 20, bookedSeats: 3 },
+    { scheduleId: 103, busName: 'Southern Star', busVehicleNo: 'ND-8812', fromLocation: 'Colombo', toLocation: 'Galle', departureTime: '2026-09-03T07:15:00', arrivalTime: '2026-09-03T09:45:00', price: 1100, totalSeats: 20, bookedSeats: 8 },
+    { scheduleId: 104, busName: 'Coastal Rider', busVehicleNo: 'NE-3071', fromLocation: 'Colombo', toLocation: 'Galle', departureTime: '2026-09-03T14:30:00', arrivalTime: '2026-09-03T17:00:00', price: 950, totalSeats: 20, bookedSeats: 2 },
+    { scheduleId: 105, busName: 'Northbound', busVehicleNo: 'NF-6402', fromLocation: 'Kandy', toLocation: 'Jaffna', departureTime: '2026-09-03T05:45:00', arrivalTime: '2026-09-03T15:30:00', price: 2850, totalSeats: 20, bookedSeats: 11 },
+    { scheduleId: 106, busName: 'Heritage Line', busVehicleNo: 'NG-1108', fromLocation: 'Galle', toLocation: 'Colombo', departureTime: '2026-09-03T16:00:00', arrivalTime: '2026-09-03T18:30:00', price: 1100, totalSeats: 20, bookedSeats: 4 }
+];
+
+function getDemoBookings() {
+    try { return JSON.parse(localStorage.getItem('demoBookings') || '[]'); } catch (error) { return []; }
+}
+
+function saveDemoBookings(bookings) {
+    localStorage.setItem('demoBookings', JSON.stringify(bookings));
+}
+
+function getDemoBookedSeats(scheduleId) {
+    const baseBookedSeats = Array.from({ length: DEMO_BUSES.find(bus => bus.scheduleId === Number(scheduleId))?.bookedSeats || 0 }, (_, index) => index + 1);
+    return baseBookedSeats.concat(getDemoBookings()
+        .filter(booking => booking.scheduleId === Number(scheduleId) && booking.status !== 'Cancelled')
+        .flatMap(booking => (booking.busBookingPassenger || []).map(passenger => passenger.seatNo)));
+}
+
+function getDemoResponse(endpoint, body) {
+    if (endpoint.includes('searchBus')) {
+        const params = new URLSearchParams(endpoint.split('?')[1]);
+        const buses = DEMO_BUSES.filter(bus => bus.fromLocation === params.get('fromLocation') && bus.toLocation === params.get('toLocation'));
+        return { result: true, data: buses };
+    }
+    if (endpoint.includes('getBookedSeats')) return { result: true, data: getDemoBookedSeats(new URLSearchParams(endpoint.split('?')[1]).get('scheduleId')) };
+    if (endpoint.includes('GetAllBusBookings')) return { result: true, data: getDemoBookings() };
+    if (endpoint.includes('PostBusBooking')) {
+        const bookings = getDemoBookings();
+        const booking = { ...body, bookingId: Date.now(), status: 'Confirmed', customerName: getCurrentUser()?.fullName || getCurrentUser()?.userName || 'Demo customer', totalAmount: body.busBookingPassenger.length * (DEMO_BUSES.find(bus => bus.scheduleId === Number(body.scheduleId))?.price || 0) };
+        bookings.unshift(booking);
+        saveDemoBookings(bookings);
+        return { result: true, data: booking };
+    }
+    if (endpoint.includes('DeleteBusBooking')) {
+        const bookingId = Number(new URLSearchParams(endpoint.split('?')[1]).get('bookingId'));
+        saveDemoBookings(getDemoBookings().map(booking => booking.bookingId === bookingId ? { ...booking, status: 'Cancelled' } : booking));
+        return { result: true, data: true };
+    }
+    return { result: false, message: 'Demo data unavailable' };
+}
+
 // ==========================================
 // API Helper Functions with Better Error Handling
 // ==========================================
@@ -31,10 +78,7 @@ async function apiGet(endpoint) {
         // Check if response is OK
         if (!response.ok) {
             console.error(`HTTP Error: ${response.status} ${response.statusText}`);
-            return { 
-                result: false, 
-                message: `Server error: ${response.status} ${response.statusText}` 
-            };
+            return getDemoResponse(endpoint);
         }
         
         const data = await response.json();
@@ -44,21 +88,7 @@ async function apiGet(endpoint) {
     } catch (error) {
         console.error('Network Error:', error);
         
-        // More specific error messages
-        let errorMessage = 'Network error - Please check your connection';
-        
-        if (error.message.includes('Failed to fetch')) {
-            errorMessage = 'Cannot connect to server. Please check if API is running.';
-        } else if (error.message.includes('NetworkError')) {
-            errorMessage = 'Network error. Please check your internet connection.';
-        } else if (error.message.includes('CORS')) {
-            errorMessage = 'CORS error. API server may not allow cross-origin requests.';
-        }
-        
-        return { 
-            result: false, 
-            message: errorMessage 
-        };
+        return getDemoResponse(endpoint);
     }
 }
 
@@ -79,10 +109,7 @@ async function apiPost(endpoint, body) {
         
         if (!response.ok) {
             console.error(`HTTP Error: ${response.status} ${response.statusText}`);
-            return { 
-                result: false, 
-                message: `Server error: ${response.status} ${response.statusText}` 
-            };
+            return getDemoResponse(endpoint, body);
         }
         
         const data = await response.json();
@@ -92,19 +119,7 @@ async function apiPost(endpoint, body) {
     } catch (error) {
         console.error('Network Error:', error);
         
-        // More specific error messages
-        let errorMessage = 'Network error - Please check your connection';
-        
-        if (error.message.includes('Failed to fetch')) {
-            errorMessage = 'Cannot connect to server. Please check if API is running.';
-        } else if (error.message.includes('CORS')) {
-            errorMessage = 'CORS error. API server may not allow cross-origin requests.';
-        }
-        
-        return { 
-            result: false, 
-            message: errorMessage 
-        };
+        return getDemoResponse(endpoint, body);
     }
 }
 
@@ -124,10 +139,7 @@ async function apiPut(endpoint, body) {
         });
         
         if (!response.ok) {
-            return { 
-                result: false, 
-                message: `Server error: ${response.status} ${response.statusText}` 
-            };
+                return getDemoResponse(endpoint, body);
         }
         
         const data = await response.json();
@@ -136,10 +148,7 @@ async function apiPut(endpoint, body) {
         
     } catch (error) {
         console.error('Network Error:', error);
-        return { 
-            result: false, 
-            message: 'Network error - Please check your connection' 
-        };
+        return getDemoResponse(endpoint, body);
     }
 }
 
@@ -158,10 +167,7 @@ async function apiDelete(endpoint) {
         });
         
         if (!response.ok) {
-            return { 
-                result: false, 
-                message: `Server error: ${response.status} ${response.statusText}` 
-            };
+                return getDemoResponse(endpoint);
         }
         
         const data = await response.json();
@@ -170,10 +176,7 @@ async function apiDelete(endpoint) {
         
     } catch (error) {
         console.error('Network Error:', error);
-        return { 
-            result: false, 
-            message: 'Network error - Please check your connection' 
-        };
+        return getDemoResponse(endpoint);
     }
 }
 

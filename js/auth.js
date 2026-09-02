@@ -17,6 +17,23 @@ async function loginUser(username, password) {
     }
     
     try {
+        const demoUsers = {
+            admin: { userId: 1, userName: 'admin', fullName: 'Avery Morgan', role: 'Admin', email: 'admin@routewise.test' },
+            vendor: { userId: 2, userName: 'vendor', fullName: 'Samira Perera', role: 'Vendor', email: 'vendor@routewise.test' },
+            customer: { userId: 3, userName: 'customer', fullName: 'Nimal Fernando', role: 'User', email: 'customer@routewise.test' }
+        };
+        const demoPasswords = { admin: 'admin123', vendor: 'vendor123', customer: 'customer123' };
+        if (demoUsers[username] && demoPasswords[username] === password) {
+            const userData = demoUsers[username];
+            sessionStorage.setItem('user', JSON.stringify(userData));
+            sessionStorage.setItem('isLoggedIn', 'true');
+            sessionStorage.setItem('username', username);
+            sessionStorage.setItem('loginTime', new Date().toISOString());
+            showAlert('success', `<i class="fas fa-check-circle me-2"></i>Welcome back, ${userData.fullName}!`);
+            setTimeout(() => { window.location.href = 'index.html'; }, 500);
+            return true;
+        }
+
         // Log what we're sending
         console.log('Attempting login with:', { username, password: '***' });
         

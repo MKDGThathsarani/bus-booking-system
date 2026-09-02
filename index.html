@@ -237,6 +237,9 @@
                 tomorrow.setDate(tomorrow.getDate() + 1);
                 dateInput.value = tomorrow.toISOString().split('T')[0];
             }
+
+            document.getElementById('fromLocation').value = 'Colombo';
+            document.getElementById('toLocation').value = 'Kandy';
             
             // Search Form Handler
             document.getElementById('searchForm').addEventListener('submit', async function(e) {
